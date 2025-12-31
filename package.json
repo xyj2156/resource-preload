@@ -1,0 +1,51 @@
+{
+  "name": "resource-preloader",
+  "version": "1.0.0",
+  "description": "浏览器端资源预加载工具，支持依赖处理、并行/顺序加载、自定义加载器",
+  "keywords": [
+    "preload",
+    "resource",
+    "loader",
+    "browser",
+    "dependency"
+  ],
+  "author": "",
+  "license": "MIT",
+  "browserslist": [
+    "last 2 versions",
+    "IE >= 11"
+  ],
+  "main": "dist/resource-preloader.ems.js",
+  "module": "dist/resource-preloader.esm.js",
+  "browser": {
+    "dist/resource-preloader.esm.js": "dist/resource-preloader.esm.js",
+    "./dist/resource-preloader.js": "./dist/resource-preloader.amd.js"
+  },
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/resource-preloader.cjs.js",
+      "import": "./dist/resource-preloader.esm.js",
+      "default": "./dist/resource-preloader.esm.js",
+      "amd": "./dist/resource-preloader.amd.js",
+      "umd": "./dist/resource-preloader.umd.js",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "type": "module",
+  "files": [
+    "src",
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.54.0"
+  }
+}
