@@ -1,13 +1,8 @@
-import { preloadResources } from './scheduler.js';
-import { registerLoader } from './loader.js';
-import { setGlobalConfig } from './config.js';
+import {resourceLoader} from './scheduler.js';
 
-// 导出核心API
-export {
-    preloadResources, // 核心预加载方法
-    registerLoader,   // 注册自定义加载器
-    setGlobalConfig,  // 配置公共配置
-};
+export {resourceLoader} from './scheduler.js'; // 核心预加载方法
+export {registerLoader} from './loader.js'; // 注册自定义加载器
+export {setGlobalConfig} from './config.js';  // 配置公共配置
 
 // 默认导出核心预加载方法
-export default preloadResources;
+export default resourceLoader;

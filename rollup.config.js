@@ -9,7 +9,8 @@ export default [
         output: {
             file: 'dist/resource-loader.esm.js',
             format: 'es',
-            sourcemap: true
+            sourcemap: true,
+            exports: 'named'
         },
         plugins: [
             resolve(),
@@ -24,6 +25,7 @@ export default [
             file: 'dist/resource-loader.esm.min.js',
             format: 'es',
             sourcemap: true,
+            exports: 'named'
         },
         plugins: [
             resolve(),
@@ -34,11 +36,12 @@ export default [
 
     // CommonJS 格式 - 开发版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.cjs.js',
             format: 'cjs',
-            sourcemap: true
+            sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),
@@ -48,11 +51,12 @@ export default [
 
     // CommonJS 格式 - 生产版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.cjs.min.js',
             format: 'cjs',
             sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),
@@ -63,13 +67,14 @@ export default [
 
     // UMD 格式 - 开发版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.umd.js',
             format: 'umd',
             name: 'ResourceLoader',
             globals: {},
-            sourcemap: true
+            sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),
@@ -79,13 +84,14 @@ export default [
 
     // UMD 格式 - 生产版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.umd.min.js',
             format: 'umd',
             name: 'ResourceLoader',
             globals: {},
-            sourcemap: true
+            sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),
@@ -96,11 +102,12 @@ export default [
 
     // AMD 格式 - 开发版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.amd.js',
             format: 'amd',
-            sourcemap: true
+            sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),
@@ -110,11 +117,12 @@ export default [
 
     // AMD 格式 - 生产版
     {
-        input: 'src/index.js',
+        input: 'src/other.js',
         output: {
             file: 'dist/resource-loader.amd.min.js',
             format: 'amd',
-            sourcemap: true
+            sourcemap: true,
+            exports: 'default'
         },
         plugins: [
             resolve(),

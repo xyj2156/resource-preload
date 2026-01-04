@@ -1,6 +1,5 @@
-import { getGlobalConfig } from './config.js';
-import { getLoader } from './loader.js';
-import { wrapLoadPromise } from './loader.js';
+import {getGlobalConfig} from './config.js';
+import {getLoader, wrapLoadPromise} from './loader.js';
 
 /**
  * 检测循环依赖（深度优先遍历，配置字段改为dependencies）
@@ -50,7 +49,7 @@ function checkAllCycles(configList) {
 
 /**
  * 递归加载单个资源及其所有依赖（保证依赖先加载，配置字段改为dependencies）
- * @param {number} resourceId - 资源ID
+ * @param {string|number} resourceId - 资源ID
  * @param {Array} configList - 完整配置数组
  * @param {number} timeout - 超时时间
  * @param {Map} loadedMap - 已加载资源的结果缓存
@@ -73,7 +72,7 @@ async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) 
     }
 
     // 2. 再加载当前资源的urls（顺序加载，一个成功即可）
-    const { urls, type } = currentConfig;
+    const {urls, type} = currentConfig;
     let loadResult = null;
     let status = 'success';
     let error = null;
@@ -128,16 +127,40 @@ async function loadUrlsInOrder(urls, type, timeout) {
 
 /**
  * 核心加载调度方法（最终结果保持配置定义顺序）
- * @param {Array} configList - 输入配置数组
- * @returns {Promise<Array>} 按配置定义顺序的加载结果数组
+ * @param {Array<ResourceConfig>} configList - 输入配置数组
+ * @returns {Promise<ResourceLoadResult[]>} 按配置定义顺序的加载结果数组
  */
-async function preloadResources(configList) {
+async function resourceLoader(configList) {
     if (!Array.isArray(configList) || configList.length === 0) {
         throw new Error('配置数组必须是非空数组');
     }
 
+    // 将 string[] 形式处理成 { name, urls, type } 形式
+    configList = configList.map(item => {
+        if (typeof item === 'string') {
+            const url = new URL(item, window.location.href);
+            return {
+                name: url.pathname,
+                urls: [item],
+                type: url.pathname.split('.').pop() || 'js',
+            };
+        } else if (Array.isArray(item)) {
+            if (!item.length) {
+                return;
+            }
+            const url = new URL(item[0], window.location.href);
+            return {
+                name: url.pathname,
+                urls: item,
+                type: url.pathname.split('.').pop() || 'js',
+            };
+        } else {
+            return item;
+        }
+    }).filter(Boolean);
+
     // 1. 获取全局配置
-    const { timeout: globalTimeout } = getGlobalConfig();
+    const {timeout: globalTimeout} = getGlobalConfig();
 
     // 2. 预检测所有循环依赖（防止无限递归）
     checkAllCycles(configList);
@@ -151,8 +174,12 @@ async function preloadResources(configList) {
     });
 
     // 5. 等待所有资源加载完成，返回原始配置顺序的结果
-    const finalResult = await Promise.all(rawOrderPromises);
-    return finalResult;
+    return Promise.all(rawOrderPromises).then(function (result) {
+        if (result.find(item => item.error)) {
+            return Promise.reject(result);
+        }
+        return result;
+    });
 }
 
-export { preloadResources };
+export {resourceLoader};
