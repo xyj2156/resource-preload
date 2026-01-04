@@ -61,7 +61,7 @@ export function resourceLoader(configList: ResourceConfig[]): Promise<ResourceLo
  * @param type - 资源类型标识
  * @param handler - 加载处理函数
  */
-export function registerLoader(type: string, handler: LoaderHandler): void;
+export function resourcePreloader(type: string, handler: LoaderHandler): void;
 
 /**
  * 设置全局配置
@@ -70,4 +70,4 @@ export function registerLoader(type: string, handler: LoaderHandler): void;
  */
 export function setGlobalConfig(config: Partial<GlobalConfig>): GlobalConfig;
 
-export default resourceLoader;
+export default resourcePreloader;

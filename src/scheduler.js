@@ -130,7 +130,7 @@ async function loadUrlsInOrder(urls, type, timeout) {
  * @param {Array<ResourceConfig>} configList - 输入配置数组
  * @returns {Promise<ResourceLoadResult[]>} 按配置定义顺序的加载结果数组
  */
-async function resourceLoader(configList) {
+async function resourcePreloader(configList) {
     if (!Array.isArray(configList) || configList.length === 0) {
         throw new Error('配置数组必须是非空数组');
     }
@@ -182,4 +182,4 @@ async function resourceLoader(configList) {
     });
 }
 
-export {resourceLoader};
+export {resourcePreloader};

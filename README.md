@@ -28,34 +28,34 @@ const config = [
 ```js
 /** ESM **/
 // 导入加载方法
-import {resourceLoader} from 'reource-loader';
-import resourceLoader from 'reource-loader';
+import {resourcePreloader} from 'reource-preloader';
+import resourcePreloader from 'reource-preloader';
 // 导入配置设置
-import {registerLoader} from 'reource-loader';
-import {setGlobalConfig} from 'reource-loader';
+import {registerLoader} from 'reource-preloader';
+import {setGlobalConfig} from 'reource-preloader';
 ```
 
 > 为了和ESM感觉用起来一样，AMD、Commonjs、UMD 等默认导出的是加载方法
 ```js
 /** AMD/UMD(直接在浏览器中使用时，请引入requirejs) **/
-require(['resource-loader'], function (resourceLoader) {
+require(['resource-preloader'], function (resourcePreloader) {
     // 加载器
-    resourceLoader([]);
+    resourcePreloader([]);
     // 配置
-    resourceLoader.setGlobalConfig({timeout: 1500, retry: 0});
-    resourceLoader.registerLoader('name', function () {
+    resourcePreloader.setGlobalConfig({timeout: 1500, retry: 0});
+    resourcePreloader.registerLoader('name', function () {
         return Promise.reject('数据');
     });
 });
 ```
 ```js
 /** CJS/UMD(直接在浏览器中使用时，需要使用 browserify 打包) **/
-const resourceLoader = require('resource-loader');
+const resourcePreloader = require('resource-preloader');
 // 加载器
-resourceLoader([]);
+resourcePreloader([]);
 // 配置
-resourceLoader.setGlobalConfig({timeout: 1500, retry: 0});
-resourceLoader.registerLoader('name', function () {
+resourcePreloader.setGlobalConfig({timeout: 1500, retry: 0});
+resourcePreloader.registerLoader('name', function () {
     return Promise.reject('数据');
 });
 
