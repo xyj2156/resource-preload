@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>ResourceLoader UMD 测试页面</title>
+</head>
+<body>
+<script src="/test/config.js" type="text/javascript" charset="UTF-8"></script>
+<script src="/dist/resource-loader.umd.js" type="text/javascript" charset="UTF-8"></script>
+<script defer>
+    resourceLoader(resourceConfig).then(...createCallback('umd'))
+</script>
+</body>
+</html>

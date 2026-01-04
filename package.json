@@ -40,12 +40,15 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rollup -c rollup.config.js"
+    "build": "rollup -c rollup.config.js",
+    "build:cjs-test": "browserify ./test/cjs-test.cjs -o ./test/cjs-test.js",
+    "preview": "node preview.js"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
+    "browserify": "^17.0.1",
     "rollup": "^4.54.0"
   }
 }
