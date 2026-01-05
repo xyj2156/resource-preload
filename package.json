@@ -1,6 +1,6 @@
 {
   "name": "resource-preloader",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "浏览器端资源预加载工具，支持依赖处理、并行/顺序加载、自定义加载器",
   "keywords": [
     "preload",
@@ -15,12 +15,6 @@
     "last 2 versions",
     "IE >= 11"
   ],
-  "main": "dist/resource-preloader.ems.js",
-  "module": "dist/resource-preloader.esm.js",
-  "browser": {
-    "dist/resource-preloader.esm.js": "dist/resource-preloader.esm.js",
-    "./dist/resource-preloader.js": "./dist/resource-preloader.umd.js"
-  },
   "types": "types/index.d.ts",
   "exports": {
     ".": {

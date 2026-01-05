@@ -275,7 +275,7 @@ async function loadUrlsInOrder(urls, type, timeout) {
  * @param {Array<ResourceConfig>} configList - 输入配置数组
  * @returns {Promise<ResourceLoadResult[]>} 按配置定义顺序的加载结果数组
  */
-async function preloadResources(configList) {
+async function resourcePreloader(configList) {
     if (!Array.isArray(configList) || configList.length === 0) {
         throw new Error('配置数组必须是非空数组');
     }
@@ -327,16 +327,16 @@ async function preloadResources(configList) {
     });
 }
 
-preloadResources.registerLoader = registerLoader;
-preloadResources.setGlobalConfig = setGlobalConfig;
+resourcePreloader.registerLoader = registerLoader;
+resourcePreloader.setGlobalConfig = setGlobalConfig;
 
-module.exports = preloadResources;
+module.exports = resourcePreloader;
 
 
 },{}],2:[function(require,module,exports){
-const loader = require('../dist/resource-loader.cjs.js');
+const loader = require('../dist/resource-preloader.cjs.js');
 
 loader(resourceConfig).then(... createCallback('cjs'));
 
 
-},{"../dist/resource-loader.cjs.js":1}]},{},[2]);
+},{"../dist/resource-preloader.cjs.js":1}]},{},[2]);

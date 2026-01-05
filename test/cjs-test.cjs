@@ -1,4 +1,4 @@
-const loader = require('../dist/resource-loader.cjs.js');
+const loader = require('../dist/resource-preloader.cjs.js');
 
 loader(resourceConfig).then(... createCallback('cjs'));
 

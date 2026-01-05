@@ -7,7 +7,7 @@ export default [
     {
         input: 'src/index.js',
         output: {
-            file: 'dist/resource-loader.esm.js',
+            file: 'dist/resource-preloader.esm.js',
             format: 'es',
             sourcemap: true,
             exports: 'named'
@@ -22,7 +22,7 @@ export default [
     {
         input: 'src/index.js',
         output: {
-            file: 'dist/resource-loader.esm.min.js',
+            file: 'dist/resource-preloader.esm.min.js',
             format: 'es',
             sourcemap: true,
             exports: 'named'
@@ -38,7 +38,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.cjs.js',
+            file: 'dist/resource-preloader.cjs.js',
             format: 'cjs',
             sourcemap: true,
             exports: 'default'
@@ -53,7 +53,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.cjs.min.js',
+            file: 'dist/resource-preloader.cjs.min.js',
             format: 'cjs',
             sourcemap: true,
             exports: 'default'
@@ -69,7 +69,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.umd.js',
+            file: 'dist/resource-preloader.umd.js',
             format: 'umd',
             name: 'ResourceLoader',
             globals: {},
@@ -86,7 +86,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.umd.min.js',
+            file: 'dist/resource-preloader.umd.min.js',
             format: 'umd',
             name: 'ResourceLoader',
             globals: {},
@@ -104,7 +104,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.amd.js',
+            file: 'dist/resource-preloader.amd.js',
             format: 'amd',
             sourcemap: true,
             exports: 'default'
@@ -119,7 +119,7 @@ export default [
     {
         input: 'src/other.js',
         output: {
-            file: 'dist/resource-loader.amd.min.js',
+            file: 'dist/resource-preloader.amd.min.js',
             format: 'amd',
             sourcemap: true,
             exports: 'default'

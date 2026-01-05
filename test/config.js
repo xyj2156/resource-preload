@@ -1,6 +1,6 @@
 const resourceConfig = [
-    '/dist/resource-loader.amd.js',
-    '/dist/resource-loader.umd.js',
+    '/dist/resource-preloader.amd.js',
+    '/dist/resource-preloader.umd.js',
     ['http://baidu.com/baidu.js', 'http://baidu.com/error.js']
 ];
 
