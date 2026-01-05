@@ -25,11 +25,11 @@ export interface LoadResult {
 // 资源加载结果类型
 export interface ResourceLoadResult {
   /** 资源ID */
-  resourceId: string;
+  name: string;
   /** 原始配置 */
   config: ResourceConfig;
   /** 加载结果 */
-  loadResult: LoadResult;
+  result: LoadResult;
   /** 加载状态 */
   status: 'success' | 'failed';
   /** 错误信息 */

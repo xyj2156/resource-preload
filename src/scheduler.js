@@ -1,5 +1,5 @@
 import {getGlobalConfig} from './config.js';
-import {getLoader, wrapLoadPromise} from './loader.js';
+import {wrapLoadPromise} from './loader.js';
 
 /**
  * 检测循环依赖（深度优先遍历，配置字段改为dependencies）
@@ -49,26 +49,27 @@ function checkAllCycles(configList) {
 
 /**
  * 递归加载单个资源及其所有依赖（保证依赖先加载，配置字段改为dependencies）
- * @param {string|number} resourceId - 资源ID
+ * @param {string|number} name - 资源ID
  * @param {Array} configList - 完整配置数组
  * @param {number} timeout - 超时时间
  * @param {Map} loadedMap - 已加载资源的结果缓存
+ * @returns {Promise<ResourceLoadResult>} 加载结果
  */
-async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) {
+async function loadResourceWithDeps(name, configList, timeout, loadedMap) {
     // 若已加载，直接返回缓存结果
-    if (loadedMap.has(resourceId)) {
-        return loadedMap.get(resourceId);
+    if (loadedMap.has(name)) {
+        return loadedMap.get(name);
     }
 
-    const currentConfig = configList.find(item => item.name === resourceId);
+    const currentConfig = configList.find(item => item.name === name);
     if (!currentConfig) {
-        throw new Error(`未找到ID为${resourceId}的资源配置`);
+        throw new Error(`未找到name为${name}的资源配置`);
     }
 
     // 1. 先加载所有依赖（改为dependencies）
     const dependencies = currentConfig.dependencies || [];
-    for (const depId of dependencies) {
-        await loadResourceWithDeps(depId, configList, timeout, loadedMap);
+    for (const _ of dependencies) {
+        await loadResourceWithDeps(_, configList, timeout, loadedMap);
     }
 
     // 2. 再加载当前资源的urls（顺序加载，一个成功即可）
@@ -86,13 +87,13 @@ async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) 
 
     // 3. 缓存加载结果
     const result = {
-        resourceId,
+        name,
         config: currentConfig,
-        loadResult,
+        result:loadResult,
         status,
         error,
     };
-    loadedMap.set(resourceId, result);
+    loadedMap.set(name, result);
     return result;
 }
 
@@ -101,23 +102,21 @@ async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) 
  * @param {Array} urls - 资源地址数组
  * @param {string} type - 资源类型
  * @param {number} timeout - 超时时间
- * @returns {Promise<Object>} 第一个成功的加载结果
+ * @returns {Promise<LoadResult>} 成功的加载结果
  */
 async function loadUrlsInOrder(urls, type, timeout) {
     if (!Array.isArray(urls) || urls.length === 0) {
         throw new Error('urls必须是非空数组');
     }
 
-    const loader = getLoader(type);
     let lastError;
 
     // 按顺序遍历urls，直到有一个加载成功
     for (const url of urls) {
         try {
-            return await wrapLoadPromise(url, loader, timeout);
+            return await wrapLoadPromise(url, type, timeout);
         } catch (error) {
-            lastError = error;
-            continue; // 加载失败，继续下一个url
+            lastError = error; // 加载失败，继续下一个url
         }
     }
 
@@ -130,7 +129,7 @@ async function loadUrlsInOrder(urls, type, timeout) {
  * @param {Array<ResourceConfig>} configList - 输入配置数组
  * @returns {Promise<ResourceLoadResult[]>} 按配置定义顺序的加载结果数组
  */
-async function resourcePreloader(configList) {
+export async function resourcePreloader(configList) {
     if (!Array.isArray(configList) || configList.length === 0) {
         throw new Error('配置数组必须是非空数组');
     }
@@ -169,7 +168,7 @@ async function resourcePreloader(configList) {
     const loadedMap = new Map();
 
     // 4. 按配置定义的顺序，并行加载同层级无依赖资源（保证依赖先加载，结果保留原始顺序）
-    const rawOrderPromises = configList.map(async (config) => {
+    const rawOrderPromises = configList.map(async function(config) {
         return await loadResourceWithDeps(config.name, configList, globalTimeout, loadedMap);
     });
 
@@ -181,5 +180,3 @@ async function resourcePreloader(configList) {
         return result;
     });
 }
-
-export {resourcePreloader};

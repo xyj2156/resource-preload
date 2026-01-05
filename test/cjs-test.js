@@ -7,12 +7,13 @@ const defaultConfig = {
     retry: 0, // 默认不重试
 };
 
+/** @var {GlobalConfig} */
 let globalConfig = { ...defaultConfig };
 
 /**
  * 配置公共配置的方法（导出）
- * @param {Object} config - 需覆盖的公共配置
- * @returns {Object} 合并后的最终全局配置
+ * @param {GlobalConfig} config - 需覆盖的公共配置
+ * @returns {GlobalConfig} 合并后的最终全局配置
  */
 function setGlobalConfig(config) {
     if (typeof config !== 'object' || config === null) {
@@ -24,7 +25,7 @@ function setGlobalConfig(config) {
 
 /**
  * 获取当前全局配置
- * @returns {Object} 全局配置
+ * @returns {GlobalConfig} 全局配置
  */
 function getGlobalConfig() {
     return { ...globalConfig };
@@ -36,20 +37,22 @@ const loaderMap = new Map();
 /**
  * 通用资源加载Promise封装
  * @param {string} url - 资源地址
- * @param {Function} loadHandler - 具体的资源加载处理函数
+ * @param {string} type - 具体的资源加载处理函数
  * @param {number} timeout - 超时时间
- * @returns {Promise<Object>} 加载结果Promise
+ * @returns {Promise<LoadResult>} 加载结果Promise
  */
-function wrapLoadPromise(url, loadHandler, timeout) {
-    return new Promise((resolve, reject) => {
+function wrapLoadPromise(url, type, timeout) {
+    return new Promise(function (resolve, reject) {
+        // 获取加载器处理函数
+        const handler = getLoader(type);
         // 超时处理
         const timeoutTimer = setTimeout(() => {
             reject(new Error(`Resource ${url} load timeout (${timeout}ms)`));
         }, timeout);
 
         // 执行具体加载逻辑
-        loadHandler(url)
-            .then((result) => {
+        handler(url)
+            .then(function (result) {
                 clearTimeout(timeoutTimer);
                 resolve({
                     url,
@@ -58,7 +61,7 @@ function wrapLoadPromise(url, loadHandler, timeout) {
                     error: null,
                 });
             })
-            .catch((error) => {
+            .catch(function (error) {
                 clearTimeout(timeoutTimer);
                 reject({
                     url,
@@ -70,62 +73,120 @@ function wrapLoadPromise(url, loadHandler, timeout) {
     });
 }
 
+/** 初始化内置加载器 **/
 // --------------- 内置JS加载器 ---------------
-function jsLoaderHandler(url) {
-    return new Promise((resolve, reject) => {
+loaderMap.set(
+    'js',
+    /**
+     * JS加载器
+     * @param {string} url
+     * @returns {Promise<HTMLScriptElement|void>}
+     */
+    function (url) {
         const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = url;
-        script.async = false; // 保持加载顺序（不开启异步）
+        return new Promise(function (resolve, reject) {
+            script.type = 'text/javascript';
+            script.src = url;
+            script.async = false; // 保持加载顺序（不开启异步）
+            script.dataset.flag = 'resource-preloader';
 
-        script.onload = () => {
-            resolve(script);
-            document.head.removeChild(script); // 可选：加载完成后移除标签，避免污染DOM
-        };
+            script.addEventListener('load', function (e) {
+                resolve(script);
+            });
+            script.addEventListener('error', function () {
+                reject(new Error(`JS resource ${url} load failed`));
+            });
 
-        script.onerror = () => {
-            reject(new Error(`JS resource ${url} load failed`));
+            document.head.appendChild(script);
+        }).finally(function () {
+            // 加载完成后移除标签，避免污染DOM
             document.head.removeChild(script);
-        };
-
-        document.head.appendChild(script);
-    });
-}
-
+        });
+    }
+);
 // --------------- 内置CSS加载器 ---------------
-function cssLoaderHandler(url) {
-    return new Promise((resolve, reject) => {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = url;
+loaderMap.set(
+    'css',
+    /**
+     * CSS加载器
+     * @param {string} url
+     * @returns {Promise<HTMLLinkElement>}
+     */
+    function (url) {
+        return new Promise(function (resolve, reject) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = url;
+            link.dataset.flag = 'resource-preloader';
 
-        link.onload = () => {
-            resolve(link);
-        };
-
-        link.onerror = () => {
-            reject(new Error(`CSS resource ${url} load failed`));
-        };
-
-        document.head.appendChild(link);
-    });
-}
-
-// 初始化内置加载器
-loaderMap.set('js', jsLoaderHandler);
-loaderMap.set('css', cssLoaderHandler);
+            link.addEventListener('load', function () {
+                resolve(link);
+            });
+            link.addEventListener('error', function () {
+                reject(new Error(`CSS resource ${url} load failed`));
+                document.head.removeChild(link);
+            });
+            document.head.appendChild(link);
+        });
+    }
+);
+// --------------- 内置IMG加载器 ---------------
+loaderMap.set(
+    'img',
+    /**
+     * 图片加载器
+     * @param url
+     * @returns {Promise<HTMLImageElement>}
+     */
+    function (url) {
+        const img = new Image();
+        img.dataset.flag = 'resource-preloader';
+        return new Promise(function (resolve, reject) {
+            img.addEventListener('load', function () {
+                resolve(img);
+            });
+            img.addEventListener('error', function () {
+                reject(new Error(`IMG resource ${url} load failed`));
+            });
+            // img 标签不需要添加到DOM树
+            img.src = url;
+        });
+    }
+);
+// --------------- 内置JSON加载器 ---------------
+loaderMap.set(
+    'json',
+    /**
+     * JSON加载器
+     * @param {string} url
+     * @returns {Promise<Object|Array|null|undefined>}
+     */
+    function (url) {
+        return fetch(url)
+            .then(function (res) {
+                if (!res.ok) {
+                    throw new Error(`JSON resource ${url} load failed`);
+                }
+                return res.json();
+            })
+            .catch(function (error) {
+                throw new Error(`JSON resource ${url} load failed: ${error.message}`);
+            });
+    }
+);
 
 /**
- * 注册自定义加载器的方法（导出）
+ * 注册自定义加载器的方法
  * @param {string} type - 资源类型（唯一标识）
- * @param {Function} handler - 加载处理函数，接收url参数，返回Promise
+ * @param {LoaderHandler} handler - 加载处理函数，接收url参数，返回Promise
  */
 function registerLoader(type, handler) {
     if (typeof type !== 'string' || type.trim() === '') {
         throw new Error('资源类型必须是非空字符串');
     }
-    if (typeof handler !== 'function' || handler.constructor.name !== 'Function') {
-        throw new Error('加载器必须是一个函数，且返回Promise对象');
+    const _ = Object.prototype.toString.call(type).slice(8, -1);
+    if (['Function', 'AsyncFunction'].includes(_)) {
+        throw new Error('加载器必须是一个函数返回Promise对象或一个异步函数');
     }
     if (loaderMap.has(type)) {
         console.warn(`类型为${type}的加载器已存在，将被覆盖`);
@@ -144,7 +205,6 @@ function getLoader(type) {
     }
     return loaderMap.get(type);
 }
- // 导出wrapLoadPromise，避免冗余
 
 /**
  * 检测循环依赖（深度优先遍历，配置字段改为dependencies）
@@ -194,26 +254,27 @@ function checkAllCycles(configList) {
 
 /**
  * 递归加载单个资源及其所有依赖（保证依赖先加载，配置字段改为dependencies）
- * @param {string|number} resourceId - 资源ID
+ * @param {string|number} name - 资源ID
  * @param {Array} configList - 完整配置数组
  * @param {number} timeout - 超时时间
  * @param {Map} loadedMap - 已加载资源的结果缓存
+ * @returns {Promise<ResourceLoadResult>} 加载结果
  */
-async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) {
+async function loadResourceWithDeps(name, configList, timeout, loadedMap) {
     // 若已加载，直接返回缓存结果
-    if (loadedMap.has(resourceId)) {
-        return loadedMap.get(resourceId);
+    if (loadedMap.has(name)) {
+        return loadedMap.get(name);
     }
 
-    const currentConfig = configList.find(item => item.name === resourceId);
+    const currentConfig = configList.find(item => item.name === name);
     if (!currentConfig) {
-        throw new Error(`未找到ID为${resourceId}的资源配置`);
+        throw new Error(`未找到name为${name}的资源配置`);
     }
 
     // 1. 先加载所有依赖（改为dependencies）
     const dependencies = currentConfig.dependencies || [];
-    for (const depId of dependencies) {
-        await loadResourceWithDeps(depId, configList, timeout, loadedMap);
+    for (const _ of dependencies) {
+        await loadResourceWithDeps(_, configList, timeout, loadedMap);
     }
 
     // 2. 再加载当前资源的urls（顺序加载，一个成功即可）
@@ -231,13 +292,13 @@ async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) 
 
     // 3. 缓存加载结果
     const result = {
-        resourceId,
+        name,
         config: currentConfig,
         loadResult,
         status,
         error,
     };
-    loadedMap.set(resourceId, result);
+    loadedMap.set(name, result);
     return result;
 }
 
@@ -246,23 +307,21 @@ async function loadResourceWithDeps(resourceId, configList, timeout, loadedMap) 
  * @param {Array} urls - 资源地址数组
  * @param {string} type - 资源类型
  * @param {number} timeout - 超时时间
- * @returns {Promise<Object>} 第一个成功的加载结果
+ * @returns {Promise<LoadResult>} 成功的加载结果
  */
 async function loadUrlsInOrder(urls, type, timeout) {
     if (!Array.isArray(urls) || urls.length === 0) {
         throw new Error('urls必须是非空数组');
     }
 
-    const loader = getLoader(type);
     let lastError;
 
     // 按顺序遍历urls，直到有一个加载成功
     for (const url of urls) {
         try {
-            return await wrapLoadPromise(url, loader, timeout);
+            return await wrapLoadPromise(url, type, timeout);
         } catch (error) {
-            lastError = error;
-            continue; // 加载失败，继续下一个url
+            lastError = error; // 加载失败，继续下一个url
         }
     }
 

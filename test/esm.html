@@ -7,9 +7,9 @@
 <body>
 <script src="/test/config.js" type="text/javascript" charset="utf-8"></script>
 <script type="module">
-    import {preloadResources} from '/dist/resource-preloader.esm.js'
+    import {resourcePreloader, registerLoader} from '/dist/resource-preloader.esm.js'
 
-    preloadResources(resourceConfig).then(...createCallback('ems'));
+    resourcePreloader(resourceConfig).then(...createCallback('ems'));
 </script>
 </body>
 </html>

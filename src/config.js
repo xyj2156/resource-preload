@@ -4,12 +4,13 @@ const defaultConfig = {
     retry: 0, // 默认不重试
 };
 
+/** @var {GlobalConfig} */
 let globalConfig = { ...defaultConfig };
 
 /**
  * 配置公共配置的方法（导出）
- * @param {Object} config - 需覆盖的公共配置
- * @returns {Object} 合并后的最终全局配置
+ * @param {GlobalConfig} config - 需覆盖的公共配置
+ * @returns {GlobalConfig} 合并后的最终全局配置
  */
 function setGlobalConfig(config) {
     if (typeof config !== 'object' || config === null) {
@@ -21,7 +22,7 @@ function setGlobalConfig(config) {
 
 /**
  * 获取当前全局配置
- * @returns {Object} 全局配置
+ * @returns {GlobalConfig} 全局配置
  */
 function getGlobalConfig() {
     return { ...globalConfig };
