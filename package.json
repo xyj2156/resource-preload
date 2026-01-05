@@ -1,6 +1,6 @@
 {
   "name": "resource-preloader",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "浏览器端资源预加载工具，支持依赖处理、并行/顺序加载、自定义加载器",
   "keywords": [
     "preload",

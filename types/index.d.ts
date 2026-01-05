@@ -54,14 +54,14 @@ export type LoaderHandler = (url: string) => Promise<any>;
  * @param configList - 资源配置数组
  * @returns 加载结果数组的Promise
  */
-export function resourceLoader(configList: ResourceConfig[]): Promise<ResourceLoadResult[]>;
+export function resourcePreloader(configList: ResourceConfig[]): Promise<ResourceLoadResult[]>;
 
 /**
  * 注册自定义加载器
  * @param type - 资源类型标识
  * @param handler - 加载处理函数
  */
-export function resourcePreloader(type: string, handler: LoaderHandler): void;
+export function registerLoader(type: string, handler: LoaderHandler): void;
 
 /**
  * 设置全局配置
