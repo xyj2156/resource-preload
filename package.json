@@ -36,7 +36,7 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "build:cjs-test": "browserify ./test/cjs-test.cjs -o ./test/cjs-test.js",
+    "build:cjs-test": "browserify ./test/cjs-test.cjs -o ./test/cjs-test.js && browserify ./test/cjs-use-umd-test.cjs -o ./test/cjs-use-umd-test.js",
     "preview": "pnpm build:cjs-test && node preview.js"
   },
   "devDependencies": {
