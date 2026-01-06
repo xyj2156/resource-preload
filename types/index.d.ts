@@ -1,14 +1,24 @@
 // 资源配置类型
-export type ResourceConfig  = {
-  /** 资源名称/ID */
+export type ResourceConfig =
+  | {
+      /** 资源名称/ID */
+      name: string;
+      /** 资源类型 (js, css, 等) */
+      type: string;
+      /** 资源URL数组，按优先级顺序 */
+      urls: string | string[];
+      /** 依赖的其他资源ID数组 */
+      dependencies?: string[];
+    }
+  | string
+  | string[];
+
+export type FullResourceConfig = {
   name: string;
-  /** 资源类型 (js, css, 等) */
   type: string;
-  /** 资源URL数组，按优先级顺序 */
   urls: string[];
-  /** 依赖的其他资源ID数组 */
   dependencies?: string[];
-} | string| string[];
+};
 
 // 加载结果类型
 export interface LoadResult {
@@ -31,7 +41,7 @@ export interface ResourceLoadResult {
   /** 加载结果 */
   result: LoadResult;
   /** 加载状态 */
-  status: 'success' | 'failed';
+  status: "success" | "failed";
   /** 错误信息 */
   error: Error | null;
 }
@@ -54,7 +64,9 @@ export type LoaderHandler = (url: string) => Promise<any>;
  * @param configList - 资源配置数组
  * @returns 加载结果数组的Promise
  */
-export function resourcePreloader(configList: ResourceConfig[]): Promise<ResourceLoadResult[]>;
+export function resourcePreloader(
+  configList: ResourceConfig[],
+): Promise<ResourceLoadResult[]>;
 
 /**
  * 注册自定义加载器

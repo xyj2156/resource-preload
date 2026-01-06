@@ -71,7 +71,7 @@ export default [
         output: {
             file: 'dist/resource-preloader.umd.js',
             format: 'umd',
-            name: 'ResourceLoader',
+            name: 'resourcePreloader',
             globals: {},
             sourcemap: true,
             exports: 'default'
@@ -88,7 +88,7 @@ export default [
         output: {
             file: 'dist/resource-preloader.umd.min.js',
             format: 'umd',
-            name: 'ResourceLoader',
+            name: 'resourcePreloader',
             globals: {},
             sourcemap: true,
             exports: 'default'

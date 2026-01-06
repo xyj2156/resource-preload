@@ -1,6 +1,6 @@
 {
   "name": "resource-preloader",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "浏览器端资源预加载工具，支持依赖处理、并行/顺序加载、自定义加载器",
   "keywords": [
     "preload",
@@ -37,13 +37,14 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:cjs-test": "browserify ./test/cjs-test.cjs -o ./test/cjs-test.js",
-    "preview": "node preview.js"
+    "preview": "pnpm build:cjs-test && node preview.js"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "browserify": "^17.0.1",
+    "prettier": "^3.7.4",
     "rollup": "^4.54.0"
   }
 }
